@@ -1,1 +1,1 @@
-# dynamic-user-segmentation-service
+# dynamic-user-segmentation-golang
