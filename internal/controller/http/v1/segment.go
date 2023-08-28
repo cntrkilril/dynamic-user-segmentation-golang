@@ -14,7 +14,7 @@ type SegmentHandler struct {
 
 func (h *SegmentHandler) create() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var p entity.Segment
+		var p entity.CreateSegmentDTO
 		if err := h.val.ValidateRequestBody(c, &p); err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}

@@ -1,9 +1,11 @@
 package entity
 
+import "gopkg.in/guregu/null.v4"
+
 type (
 	UsersSegments struct {
-		UserID      int64  `json:"userID" db:"user_id"`
-		SegmentSlug string `json:"segmentSlug" db:"segment_slug"`
+		UserID      int64       `json:"userID" db:"user_id"`
+		SegmentSlug null.String `json:"segmentSlug" db:"segment_slug"`
 	}
 
 	GetSegmentsByUserIDDTO struct {
@@ -12,6 +14,10 @@ type (
 
 	SegmentsByUserID struct {
 		UserID   int64    `json:"userID" validate:"required,gte=1"`
-		Segments []string `json:"segments" validate:"required,gte=1"`
+		Segments []string `json:"segments" validate:"required"`
+	}
+
+	UserID struct {
+		UserID int64 `db:"user_id"`
 	}
 )

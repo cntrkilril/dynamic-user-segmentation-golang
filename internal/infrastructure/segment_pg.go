@@ -9,7 +9,7 @@ import (
 )
 
 type SegmentRepository struct {
-	db *sqlx.DB
+	db queryRunner
 }
 
 func (r *SegmentRepository) Save(ctx context.Context, slug string) (result entity.Segment, err error) {

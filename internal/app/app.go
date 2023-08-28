@@ -91,9 +91,10 @@ func Run() {
 	// infrastructures
 	segmentRepo := infrastructure.NewSegmentRepository(*db)
 	usersSegmentsRepo := infrastructure.NewUsersSegmentsRepository(*db)
+	registryGateway := infrastructure.NewPGRegistry(db)
 
 	// services
-	segmentService := service.NewSegmentService(segmentRepo)
+	segmentService := service.NewSegmentService(registryGateway)
 	usersSegmentsService := service.NewUsersSegmentsService(usersSegmentsRepo, segmentRepo)
 
 	// controllers

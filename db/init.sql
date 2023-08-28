@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS segments
 (
-    SLUG TEXT UNIQUE NOT NULL
+    slug TEXT UNIQUE NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_segments
 (
-    USER_ID      INT  NOT NULL,
-    SEGMENT_SLUG TEXT NOT NULL
+    user_id      INT NOT NULL,
+    segment_slug TEXT
 );

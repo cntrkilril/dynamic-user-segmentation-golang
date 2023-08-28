@@ -7,7 +7,7 @@ import (
 
 type (
 	SegmentService interface {
-		Create(ctx context.Context, dto entity.Segment) (result entity.Segment, err error)
+		Create(ctx context.Context, dto entity.CreateSegmentDTO) (result entity.Segment, err error)
 		Delete(ctx context.Context, dto entity.Segment) (err error)
 	}
 

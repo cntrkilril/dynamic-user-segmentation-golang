@@ -4,6 +4,7 @@ import (
 	"context"
 	"github/cntrkilril/dynamic-user-segmentation-golang/internal/controller"
 	"github/cntrkilril/dynamic-user-segmentation-golang/internal/entity"
+	"gopkg.in/guregu/null.v4"
 )
 
 type UsersSegmentsService struct {
@@ -20,37 +21,49 @@ func (s *UsersSegmentsService) Create(ctx context.Context, dto entity.SegmentsBy
 
 	currentSegmentsMap := make(map[string]bool)
 	for _, v := range currentSegments {
-		currentSegmentsMap[v.SegmentSlug] = true
+		currentSegmentsMap[v.SegmentSlug.ValueOrZero()] = true
 	}
 
 	errorArray = make([]error, 0, len(dto.Segments))
 
-	for _, v := range dto.Segments {
-		_, err = s.segmentRepo.FindBySlug(ctx, v)
-		if err != nil {
-			if err == entity.ErrSegmentNotFound {
-				errorArray = append(errorArray, entity.NewErrSegmentNotFound(v))
-				continue
-			} else {
-				errorArray = append(errorArray, err)
-				continue
+	if len(dto.Segments) == 0 {
+		if len(currentSegments) == 0 {
+			_, err := s.usersSegmentsRepo.Save(ctx, entity.UsersSegments{
+				UserID:      dto.UserID,
+				SegmentSlug: null.NewString("", false),
+			})
+			if err != nil {
+				return entity.SegmentsByUserID{}, []error{HandleServiceError(err)}
 			}
 		}
+	} else {
+		for _, v := range dto.Segments {
+			_, err = s.segmentRepo.FindBySlug(ctx, v)
+			if err != nil {
+				if err == entity.ErrSegmentNotFound {
+					errorArray = append(errorArray, entity.NewErrSegmentNotFound(v))
+					continue
+				} else {
+					errorArray = append(errorArray, err)
+					continue
+				}
+			}
 
-		if _, ok := currentSegmentsMap[v]; ok {
-			errorArray = append(errorArray, entity.NewErrUsersSegmentsIsAlreadyExist(v))
-			continue
+			if _, ok := currentSegmentsMap[v]; ok {
+				errorArray = append(errorArray, entity.NewErrUsersSegmentsIsAlreadyExist(v))
+				continue
+			}
+
+			res, err := s.usersSegmentsRepo.Save(ctx, entity.UsersSegments{
+				UserID:      dto.UserID,
+				SegmentSlug: null.NewString(v, true),
+			})
+			if err != nil {
+				errorArray = append(errorArray, HandleServiceError(err))
+			}
+
+			result.Segments = append(result.Segments, res.SegmentSlug.ValueOrZero())
 		}
-
-		res, err := s.usersSegmentsRepo.Save(ctx, entity.UsersSegments{
-			UserID:      dto.UserID,
-			SegmentSlug: v,
-		})
-		if err != nil {
-			errorArray = append(errorArray, HandleServiceError(err))
-		}
-
-		result.Segments = append(result.Segments, res.SegmentSlug)
 	}
 
 	result.UserID = dto.UserID
@@ -61,6 +74,16 @@ func (s *UsersSegmentsService) Create(ctx context.Context, dto entity.SegmentsBy
 func (s *UsersSegmentsService) Delete(ctx context.Context, dto entity.SegmentsByUserID) (errorArray []error) {
 
 	errorArray = make([]error, 0, len(dto.Segments))
+
+	if len(dto.Segments) == 0 {
+		err := s.usersSegmentsRepo.Delete(ctx, entity.UsersSegments{
+			UserID:      dto.UserID,
+			SegmentSlug: null.NewString("", false),
+		})
+		if err != nil {
+			errorArray = append(errorArray, HandleServiceError(err))
+		}
+	}
 
 	for _, v := range dto.Segments {
 		_, err := s.segmentRepo.FindBySlug(ctx, v)
@@ -76,7 +99,7 @@ func (s *UsersSegmentsService) Delete(ctx context.Context, dto entity.SegmentsBy
 
 		err = s.usersSegmentsRepo.Delete(ctx, entity.UsersSegments{
 			UserID:      dto.UserID,
-			SegmentSlug: v,
+			SegmentSlug: null.NewString(v, true),
 		})
 		if err != nil {
 			errorArray = append(errorArray, HandleServiceError(err))
@@ -98,7 +121,9 @@ func (s *UsersSegmentsService) GetSegmentsByUserID(ctx context.Context, dto enti
 	result.Segments = make([]string, 0, len(segments))
 	result.UserID = dto.UserID
 	for _, v := range segments {
-		result.Segments = append(result.Segments, v.SegmentSlug)
+		if v.SegmentSlug.Valid {
+			result.Segments = append(result.Segments, v.SegmentSlug.ValueOrZero())
+		}
 	}
 	return result, nil
 
