@@ -14,6 +14,10 @@ type (
 	}
 )
 
+func (r *PGRegistry) UsersSegmentsHistory() service.UsersSegmentsHistoryGateway {
+	return r.m.usersSegmentsHistory
+}
+
 func (r *PGRegistry) Segment() service.SegmentGateway {
 	return r.m.segments
 }
@@ -30,8 +34,9 @@ func (r *PGRegistry) WithTx(ctx context.Context, f func(manager service.EntityMa
 	defer tx.Rollback()
 
 	err = f(&pgManager{
-		segments:      &SegmentRepository{tx},
-		usersSegments: &UsersSegmentsRepository{tx},
+		segments:             &SegmentRepository{tx},
+		usersSegments:        &UsersSegmentsRepository{tx},
+		usersSegmentsHistory: &UsersSegmentsHistoryRepository{tx},
 	})
 	if err != nil {
 		return err
@@ -50,8 +55,9 @@ func NewPGRegistry(db *sqlx.DB) *PGRegistry {
 	return &PGRegistry{
 		db: db,
 		m: &pgManager{
-			segments:      &SegmentRepository{db},
-			usersSegments: &UsersSegmentsRepository{db},
+			segments:             &SegmentRepository{db},
+			usersSegments:        &UsersSegmentsRepository{db},
+			usersSegmentsHistory: &UsersSegmentsHistoryRepository{db},
 		},
 	}
 }

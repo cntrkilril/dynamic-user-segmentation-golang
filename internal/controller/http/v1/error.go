@@ -28,6 +28,9 @@ func HandleErrors(ctx *fiber.Ctx, errorArray []error) error {
 
 func HandleRespWithErrors(ctx *fiber.Ctx, data any, errorArray []error) error {
 	appErr := &entity.Error{}
+	if data != nil {
+		return ctx.Status(fiber.StatusOK).JSON(newResp(data, errorArray))
+	}
 	if errors.As(errorArray[0], &appErr) {
 		c, ok := errCodeMap[appErr.Code()]
 		if !ok {

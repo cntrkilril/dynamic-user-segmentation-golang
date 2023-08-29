@@ -12,7 +12,7 @@ type (
 		UserID int64 `params:"userID" db:"user_id" validate:"required,gte=1"`
 	}
 
-	SegmentsByUserID struct {
+	SegmentsByUserIDDTO struct {
 		UserID   int64    `json:"userID" validate:"required,gte=1"`
 		Segments []string `json:"segments" validate:"required"`
 	}

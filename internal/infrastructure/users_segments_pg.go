@@ -12,6 +12,20 @@ type UsersSegmentsRepository struct {
 	db queryRunner
 }
 
+func (r *UsersSegmentsRepository) FindUserIDsBySegmentSlug(ctx context.Context, slug string) (result []entity.UserID, err error) {
+	q := `
+		SELECT (user_id) FROM users_segments
+		WHERE segment_slug=$1;
+		`
+
+	err = r.db.SelectContext(ctx, &result, q, slug)
+	if err != nil {
+		return []entity.UserID{}, err
+	}
+
+	return result, nil
+}
+
 func (r *UsersSegmentsRepository) DeleteBySegmentSlug(ctx context.Context, slug string) (err error) {
 
 	q := `
@@ -27,7 +41,7 @@ func (r *UsersSegmentsRepository) DeleteBySegmentSlug(ctx context.Context, slug 
 	return nil
 }
 
-func (r *UsersSegmentsRepository) FindRandomUniqueUserID(ctx context.Context, limit int64) (result []entity.UserID, err error) {
+func (r *UsersSegmentsRepository) FindRandomUniqueUserIDs(ctx context.Context, limit int64) (result []entity.UserID, err error) {
 	q := `
 		SELECT * FROM (SELECT DISTINCT (user_id) from users_segments) users_segments  ORDER BY random() LIMIT $1;
 		`
@@ -40,7 +54,7 @@ func (r *UsersSegmentsRepository) FindRandomUniqueUserID(ctx context.Context, li
 	return result, nil
 }
 
-func (r *UsersSegmentsRepository) CountUniqueUser(ctx context.Context) (result int64, err error) {
+func (r *UsersSegmentsRepository) CountUniqueUsers(ctx context.Context) (result int64, err error) {
 	q := `
 		SELECT COUNT(DISTINCT (user_id)) AS count FROM users_segments;
 	`
@@ -68,7 +82,7 @@ func (r *UsersSegmentsRepository) Save(ctx context.Context, params entity.UsersS
 	return result, nil
 }
 
-func (r *UsersSegmentsRepository) FindSegmentsByUserID(ctx context.Context, userID int64) (result []entity.UsersSegments, err error) {
+func (r *UsersSegmentsRepository) FindSegmentSlugsByUserID(ctx context.Context, userID int64) (result []entity.UsersSegments, err error) {
 	q := `
 		SELECT user_id, segment_slug FROM users_segments
 		WHERE user_id=$1;

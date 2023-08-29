@@ -12,8 +12,12 @@ type (
 	}
 
 	UsersSegmentsService interface {
-		Create(ctx context.Context, dto entity.SegmentsByUserID) (result entity.SegmentsByUserID, err []error)
-		Delete(ctx context.Context, dto entity.SegmentsByUserID) (err []error)
-		GetSegmentsByUserID(ctx context.Context, dto entity.GetSegmentsByUserIDDTO) (result entity.SegmentsByUserID, err error)
+		Create(ctx context.Context, dto entity.SegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, err []error)
+		Delete(ctx context.Context, dto entity.SegmentsByUserIDDTO) (err []error)
+		GetSegmentsByUserID(ctx context.Context, dto entity.GetSegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, err error)
+	}
+
+	UsersSegmentsHistoryService interface {
+		GetCSVHistoryByUserID(ctx context.Context, dto entity.GetCSVHistoryByUserIDAndYearMonthDTO) (url entity.CSVUrl, err error)
 	}
 )

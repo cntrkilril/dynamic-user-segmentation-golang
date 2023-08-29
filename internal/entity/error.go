@@ -46,9 +46,10 @@ func NewErrUsersSegmentsIsAlreadyExist(segmentSlug string) *Error {
 }
 
 var (
-	ErrUnknown               = errors.New("что-то пошло не так")
-	ErrValidationError       = errors.New("невалидные данные")
-	ErrSegmentNotFound       = errors.New("сегмент не найден")
-	ErrUsersSegmentsNotFound = errors.New("пользователь и его сегменты не найдены")
-	ErrSegmentAlreadyExist   = errors.New("сегмент уже существует")
+	ErrUnknown                      = errors.New("что-то пошло не так")
+	ErrValidationError              = errors.New("невалидные данные")
+	ErrSegmentNotFound              = errors.New("сегмент не найден")
+	ErrUsersSegmentsNotFound        = errors.New("пользователь и его сегменты не найдены")
+	ErrUsersSegmentsHistoryNotFound = errors.New("пользователь или его история не найдены")
+	ErrSegmentAlreadyExist          = errors.New("сегмент уже существует")
 )

@@ -54,6 +54,7 @@ func Run() {
 	f.Use(cors.New(cors.Config{
 		AllowHeaders: "*",
 	}))
+	f.Static("/", cfg.Static.PathToSaveHistory)
 
 	l.Infof("fiber initialized successfully")
 
@@ -89,24 +90,28 @@ func Run() {
 	val := govalidator.New()
 
 	// infrastructures
-	segmentRepo := infrastructure.NewSegmentRepository(*db)
-	usersSegmentsRepo := infrastructure.NewUsersSegmentsRepository(*db)
+	//segmentRepo := infrastructure.NewSegmentRepository(*db)
+	usersSegmentsHistoryRepo := infrastructure.NewUsersSegmentsHistoryRepository(*db)
 	registryGateway := infrastructure.NewPGRegistry(db)
 
 	// services
 	segmentService := service.NewSegmentService(registryGateway)
-	usersSegmentsService := service.NewUsersSegmentsService(usersSegmentsRepo, segmentRepo)
+	usersSegmentsService := service.NewUsersSegmentsService(registryGateway)
+	usersSegmentsHistoryService := service.NewUsersSegmentsHistoryService(usersSegmentsHistoryRepo, cfg.Static.PathToSaveHistory, cfg.HTTP.Protocol+"://"+cfg.HTTP.Host+":"+cfg.HTTP.Port+"/")
 
 	// controllers
 	segmentHandler := v1.NewSegmentHandler(segmentService, val)
 	usersSegmentsHandler := v1.NewUsersSegmentsHandler(usersSegmentsService, val)
+	usersSegmentsHistoryHandler := v1.NewUsersSegmentsHistoryHandler(usersSegmentsHistoryService, val)
 
 	// groups
 	apiGroup := f.Group("api")
 	segmentGroup := apiGroup.Group("segment")
+	historyGroup := segmentGroup.Group("history")
 
 	segmentHandler.Register(segmentGroup)
 	usersSegmentsHandler.Register(segmentGroup)
+	usersSegmentsHistoryHandler.Register(historyGroup)
 
 	go func() {
 		err = f.Listen(net.JoinHostPort(cfg.HTTP.Host, cfg.HTTP.Port))

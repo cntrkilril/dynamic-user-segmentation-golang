@@ -14,7 +14,7 @@ type (
 )
 
 func (s *SegmentService) Create(ctx context.Context, dto entity.CreateSegmentDTO) (result entity.Segment, err error) {
-	_, err = s.repos.Segment().FindBySlug(ctx, dto.Slug)
+	_, err = s.repos.Segment().FindBySegmentSlug(ctx, dto.Slug)
 	if err != entity.ErrSegmentNotFound {
 		if err != nil {
 			return entity.Segment{}, HandleServiceError(err)
@@ -22,12 +22,12 @@ func (s *SegmentService) Create(ctx context.Context, dto entity.CreateSegmentDTO
 		return entity.Segment{}, HandleServiceError(entity.ErrSegmentAlreadyExist)
 	}
 
-	userCount, err := s.repos.UsersSegments().CountUniqueUser(ctx)
+	userCount, err := s.repos.UsersSegments().CountUniqueUsers(ctx)
 	if err != nil {
 		return entity.Segment{}, HandleServiceError(err)
 	}
 
-	randomUserIDs, err := s.repos.UsersSegments().FindRandomUniqueUserID(ctx, userCount*dto.AutoAddToUserPercent/100)
+	randomUserIDs, err := s.repos.UsersSegments().FindRandomUniqueUserIDs(ctx, userCount*dto.AutoAddToUserPercent/100)
 	if err != nil {
 		return entity.Segment{}, HandleServiceError(err)
 	}
@@ -39,7 +39,12 @@ func (s *SegmentService) Create(ctx context.Context, dto entity.CreateSegmentDTO
 		}
 
 		for _, v := range randomUserIDs {
-			_, err := s.repos.UsersSegments().Save(ctx, entity.UsersSegments{
+			_, err = m.UsersSegmentsHistory().Save(ctx, entity.SaveUsersSegmentHistoryParams{UserID: v.UserID, SegmentSlug: dto.Slug, Operation: entity.OperationAdd})
+			if err != nil {
+				return err
+			}
+
+			_, err = m.UsersSegments().Save(ctx, entity.UsersSegments{
 				UserID:      v.UserID,
 				SegmentSlug: null.NewString(dto.Slug, true),
 			})
@@ -58,7 +63,7 @@ func (s *SegmentService) Create(ctx context.Context, dto entity.CreateSegmentDTO
 }
 
 func (s *SegmentService) Delete(ctx context.Context, dto entity.Segment) (err error) {
-	_, err = s.repos.Segment().FindBySlug(ctx, dto.Slug)
+	_, err = s.repos.Segment().FindBySegmentSlug(ctx, dto.Slug)
 	if err != nil {
 		return HandleServiceError(err)
 	}
@@ -72,6 +77,14 @@ func (s *SegmentService) Delete(ctx context.Context, dto entity.Segment) (err er
 		err = s.repos.Segment().Delete(ctx, dto.Slug)
 		if err != nil {
 			return err
+		}
+		usersIDs, err := s.repos.UsersSegments().FindUserIDsBySegmentSlug(ctx, dto.Slug)
+
+		for _, v := range usersIDs {
+			_, err = m.UsersSegmentsHistory().Save(ctx, entity.SaveUsersSegmentHistoryParams{UserID: v.UserID, SegmentSlug: dto.Slug, Operation: entity.OperationDelete})
+			if err != nil {
+				return err
+			}
 		}
 
 		err = s.repos.UsersSegments().DeleteBySegmentSlug(ctx, dto.Slug)

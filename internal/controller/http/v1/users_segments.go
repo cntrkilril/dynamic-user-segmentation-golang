@@ -14,7 +14,7 @@ type UsersSegmentsHandler struct {
 
 func (h *UsersSegmentsHandler) create() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var p entity.SegmentsByUserID
+		var p entity.SegmentsByUserIDDTO
 		if err := h.val.ValidateRequestBody(c, &p); err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
@@ -57,7 +57,7 @@ func (h *UsersSegmentsHandler) getSegmentsByUserID() fiber.Handler {
 
 func (h *UsersSegmentsHandler) delete() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var p entity.SegmentsByUserID
+		var p entity.SegmentsByUserIDDTO
 		if err := h.val.ValidateRequestBody(c, &p); err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}

@@ -12,6 +12,8 @@ func HandleServiceError(err error) error {
 		return entity.NewError(entity.ErrSegmentNotFound.Error(), entity.ErrCodeNotFound)
 	case entity.ErrUsersSegmentsNotFound:
 		return entity.NewError(entity.ErrUsersSegmentsNotFound.Error(), entity.ErrCodeNotFound)
+	case entity.ErrUsersSegmentsHistoryNotFound:
+		return entity.NewError(entity.ErrUsersSegmentsHistoryNotFound.Error(), entity.ErrCodeNotFound)
 	case entity.ErrValidationError:
 		return entity.NewError(entity.ErrValidationError.Error(), entity.ErrCodeBadRequest)
 	default:

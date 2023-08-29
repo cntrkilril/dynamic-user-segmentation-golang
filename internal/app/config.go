@@ -10,6 +10,7 @@ type (
 		Logger   Logger   `validate:"required"`
 		HTTP     HTTP     `validate:"required"`
 		Postgres Postgres `validate:"required"`
+		Static   Static   `validate:"required"`
 	}
 
 	Logger struct {
@@ -17,8 +18,9 @@ type (
 	}
 
 	HTTP struct {
-		Host string `validate:"required"`
-		Port string `validate:"required"`
+		Host     string `validate:"required"`
+		Port     string `validate:"required"`
+		Protocol string `validate:"required"`
 	}
 
 	Postgres struct {
@@ -28,6 +30,10 @@ type (
 		MaxIdleConns    int           `validate:"required"`
 		ConnMaxIdleTime time.Duration `validate:"required"`
 	}
+
+	Static struct {
+		PathToSaveHistory string `validate:"required"`
+	}
 )
 
 func LoadConfig() (*Config, error) {
@@ -36,8 +42,9 @@ func LoadConfig() (*Config, error) {
 
 	cfg := &Config{
 		HTTP: HTTP{
-			Host: "localhost",
-			Port: "8080",
+			Host:     "localhost",
+			Port:     "8080",
+			Protocol: "http",
 		},
 		Logger: Logger{
 			Level: &defaultLogLevel,
@@ -48,6 +55,9 @@ func LoadConfig() (*Config, error) {
 			ConnMaxLifetime: 20,
 			MaxIdleConns:    15,
 			ConnMaxIdleTime: 30,
+		},
+		Static: Static{
+			PathToSaveHistory: "./static/history_files",
 		},
 	}
 

@@ -27,7 +27,7 @@ func (r *SegmentRepository) Save(ctx context.Context, slug string) (result entit
 	return result, nil
 }
 
-func (r *SegmentRepository) FindBySlug(ctx context.Context, slug string) (result entity.Segment, err error) {
+func (r *SegmentRepository) FindBySegmentSlug(ctx context.Context, slug string) (result entity.Segment, err error) {
 	q := `
 		SELECT * FROM segments
 		WHERE slug=$1;
