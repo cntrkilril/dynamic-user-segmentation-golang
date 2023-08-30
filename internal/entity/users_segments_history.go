@@ -19,9 +19,9 @@ type (
 	}
 
 	GetCSVHistoryByUserIDAndYearMonthDTO struct {
-		UserID int64 `json:"userID" validate:"required,gte=1"`
-		Year   int64 `json:"year" validate:"required,gte=2000,lte=3000"`
-		Month  int64 `json:"month" validate:"required,gte=1,lte=12"`
+		UserID int64 `query:"userID" validate:"required,gte=1"`
+		Year   int64 `query:"year" validate:"required,gte=2000,lte=3000"`
+		Month  int64 `query:"month" validate:"required,gte=1,lte=12"`
 	}
 
 	CSVUrl struct {

@@ -13,7 +13,7 @@ type (
 
 	UsersSegmentsService interface {
 		Create(ctx context.Context, dto entity.SegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, err []error)
-		Delete(ctx context.Context, dto entity.SegmentsByUserIDDTO) (err []error)
+		Delete(ctx context.Context, dto entity.SegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, err []error)
 		GetSegmentsByUserID(ctx context.Context, dto entity.GetSegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, err error)
 	}
 

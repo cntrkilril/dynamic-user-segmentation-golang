@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/gofiber/swagger"
 	"github.com/jmoiron/sqlx"
 	v1 "github/cntrkilril/dynamic-user-segmentation-golang/internal/controller/http/v1"
 	"github/cntrkilril/dynamic-user-segmentation-golang/internal/infrastructure"
@@ -54,7 +55,16 @@ func Run() {
 	f.Use(cors.New(cors.Config{
 		AllowHeaders: "*",
 	}))
+
+	// static
 	f.Static("/", cfg.Static.PathToSaveHistory)
+	f.Static("/docs", cfg.Swagger.PathToConfigFile)
+
+	// swagger
+	f.Get("/swagger/*", swagger.New(swagger.Config{
+		Title: "Dynamic User Segmentation service",
+		URL:   cfg.Swagger.ConfigUrl,
+	}))
 
 	l.Infof("fiber initialized successfully")
 
@@ -97,7 +107,7 @@ func Run() {
 	// services
 	segmentService := service.NewSegmentService(registryGateway)
 	usersSegmentsService := service.NewUsersSegmentsService(registryGateway)
-	usersSegmentsHistoryService := service.NewUsersSegmentsHistoryService(usersSegmentsHistoryRepo, cfg.Static.PathToSaveHistory, cfg.HTTP.Protocol+"://"+cfg.HTTP.Host+":"+cfg.HTTP.Port+"/")
+	usersSegmentsHistoryService := service.NewUsersSegmentsHistoryService(usersSegmentsHistoryRepo, cfg.Static.PathToSaveHistory, UrlHttp(cfg))
 
 	// controllers
 	segmentHandler := v1.NewSegmentHandler(segmentService, val)

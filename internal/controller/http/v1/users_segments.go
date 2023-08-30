@@ -20,7 +20,7 @@ func (h *UsersSegmentsHandler) create() fiber.Handler {
 		}
 		res, errArray := h.usersSegmentsService.Create(c.Context(), p)
 		if len(errArray) != 0 {
-			if res.UserID == 0 {
+			if res.UserID == 0 || len(res.Segments) == 0 {
 				return HandleRespWithErrors(c, nil, errArray)
 			}
 			return HandleRespWithErrors(c, res, errArray)
@@ -61,9 +61,12 @@ func (h *UsersSegmentsHandler) delete() fiber.Handler {
 		if err := h.val.ValidateRequestBody(c, &p); err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
-		errArray := h.usersSegmentsService.Delete(c.Context(), p)
+		res, errArray := h.usersSegmentsService.Delete(c.Context(), p)
 		if len(errArray) != 0 {
-			return HandleRespWithErrors(c, nil, errArray)
+			if res.UserID == 0 || len(res.Segments) == 0 {
+				return HandleRespWithErrors(c, nil, errArray)
+			}
+			return HandleRespWithErrors(c, res, errArray)
 		}
 		return c.Status(fiber.StatusOK).JSON(newResp(
 			nil,
@@ -75,7 +78,7 @@ func (h *UsersSegmentsHandler) delete() fiber.Handler {
 func (h *UsersSegmentsHandler) Register(r fiber.Router) {
 	r.Post("add-segments-to-user",
 		h.create())
-	r.Post("delete-segments-to-user",
+	r.Delete("delete-segments-to-user",
 		h.delete())
 	r.Get("get-segments-by-user-id/:userID",
 		h.getSegmentsByUserID())

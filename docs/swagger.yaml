@@ -1,0 +1,240 @@
+swagger: "2.0"
+info:
+  title: Dynamic User Segmentation service
+  description: The service that stores the user, the segments in which it consists (creating, changing, deleting segments, as well as adding and removing users to a segment), and the history of adding and removing users from segments
+  version: 1.0.0
+  contact: {
+    name: "Cntrkilril",
+    url: "https://github.com/cntrkilril",
+    email: "kmshalnov-work@yandex.ru"
+  }
+basePath: "/api/segment"
+definitions:
+  model.CreateSegmentDTO:
+    properties:
+      slug:
+        type: string
+        description: Slug of segment
+        default: SLUG
+      autoAddToUserPercent:
+        type: integer
+        description: Percentage of users who will be added automatically to this segment
+        default: 50
+  model.Segment:
+    properties:
+      slug:
+        type: string
+        description: Slug of segment
+        default: SLUG
+  model.SegmentsByUserIDDTO:
+    properties:
+      userID:
+        type: integer
+        description: ID of user
+        default: 1
+      segments:
+        type: array
+        description: List of segments
+        default: [ ]
+        items:
+          type: string
+  model.CSVUrl:
+    properties:
+      url:
+        type: string
+        description: Url of csv-file
+        default: https://example.com/id.csv
+
+paths:
+  /create:
+    post:
+      description: Creation of segments with percentage of users who will be added automatically to this segment
+      parameters:
+        - description: Segment Data
+          in: body
+          name: segment
+          required: true
+          schema:
+            $ref: '#/definitions/model.CreateSegmentDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Segment'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+        "401":
+          description: Internal error
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Create segment
+      tags:
+        - Segment
+  /delete:
+    delete:
+      description: Deleting a segment (in this case, all users who were in the segment are deleted from the segment, and this in turn is recorded in the history)
+      parameters:
+        - description: Segment Data
+          in: body
+          name: segment
+          required: true
+          schema:
+            $ref: '#/definitions/model.Segment'
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            type: object
+        "401":
+          description: Internal error
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete segment
+      tags:
+        - Segment
+  /add-segments-to-user:
+    post:
+      description: Adding a user to the list of segments (with saving to history)
+      parameters:
+        - description: Users Segments Data
+          in: body
+          name: users segments
+          required: true
+          schema:
+            $ref: '#/definitions/model.SegmentsByUserIDDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SegmentsByUserIDDTO'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+        "401":
+          description: Internal error
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Create Users Segments
+      tags:
+        - Users Segments
+  /delete-segments-to-user:
+    delete:
+      description: Deletion a user to the list of segments (with saving to history)
+      parameters:
+        - description: Users Segments Data
+          in: body
+          name: users segments
+          required: true
+          schema:
+            $ref: '#/definitions/model.SegmentsByUserIDDTO'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SegmentsByUserIDDTO'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+        "401":
+          description: Internal error
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Delete Users Segments
+      tags:
+        - Users Segments
+  /get-segments-by-user-id/{userID}:
+    get:
+      description: Getting the list segments of user
+      parameters:
+        - description: Users Data
+          in: path
+          name: userID
+          required: true
+          type: integer
+          default: 1
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.SegmentsByUserIDDTO'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+        "401":
+          description: Internal error
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get Users Segments
+      tags:
+        - Users Segments
+  /history/get-by-user-id-and-year-month:
+    get:
+      description: Getting a link to a csv file with the history of operations by user segments for a certain month of the year
+      parameters:
+        - description: User ID
+          in: query
+          name: userID
+          required: true
+          type: integer
+          default: 1
+        - description: Year
+          in: query
+          name: year
+          required: true
+          type: integer
+          default: 2023
+        - description: Month
+          in: query
+          name: month
+          required: true
+          type: integer
+          default: 8
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.CSVUrl'
+        "404":
+          description: Not Found
+          schema:
+            type: object
+        "401":
+          description: Internal error
+          schema:
+            type: object
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Get File Url With History By Year And Month
+      tags:
+        - History Users Segments

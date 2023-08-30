@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/go-playground/validator/v10"
+	"strings"
 	"time"
 )
 
@@ -11,6 +12,7 @@ type (
 		HTTP     HTTP     `validate:"required"`
 		Postgres Postgres `validate:"required"`
 		Static   Static   `validate:"required"`
+		Swagger  Swagger  `validate:"required"`
 	}
 
 	Logger struct {
@@ -33,6 +35,11 @@ type (
 
 	Static struct {
 		PathToSaveHistory string `validate:"required"`
+	}
+
+	Swagger struct {
+		PathToConfigFile string `validate:"required"`
+		ConfigUrl        string `validate:"required"`
 	}
 )
 
@@ -59,6 +66,10 @@ func LoadConfig() (*Config, error) {
 		Static: Static{
 			PathToSaveHistory: "./static/history_files",
 		},
+		Swagger: Swagger{
+			PathToConfigFile: "./docs",
+			ConfigUrl:        "http://localhost:8080/docs/swagger.yaml",
+		},
 	}
 
 	err := validator.New().Struct(cfg)
@@ -67,4 +78,15 @@ func LoadConfig() (*Config, error) {
 	}
 
 	return cfg, nil
+}
+
+func UrlHttp(config *Config) string {
+	urlHttp := strings.Builder{}
+	urlHttp.WriteString(config.HTTP.Protocol)
+	urlHttp.WriteString("://")
+	urlHttp.WriteString(config.HTTP.Host)
+	urlHttp.WriteString(":")
+	urlHttp.WriteString(config.HTTP.Port)
+	urlHttp.WriteString("/")
+	return urlHttp.String()
 }

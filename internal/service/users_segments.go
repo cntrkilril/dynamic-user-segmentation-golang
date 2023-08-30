@@ -84,7 +84,7 @@ func (s *UsersSegmentsService) Create(ctx context.Context, dto entity.SegmentsBy
 	return result, errorArray
 }
 
-func (s *UsersSegmentsService) Delete(ctx context.Context, dto entity.SegmentsByUserIDDTO) (errorArray []error) {
+func (s *UsersSegmentsService) Delete(ctx context.Context, dto entity.SegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, errorArray []error) {
 
 	errorArray = make([]error, 0, len(dto.Segments))
 
@@ -97,6 +97,8 @@ func (s *UsersSegmentsService) Delete(ctx context.Context, dto entity.SegmentsBy
 			errorArray = append(errorArray, HandleServiceError(err))
 		}
 	}
+
+	result.UserID = dto.UserID
 
 	for _, v := range dto.Segments {
 		_, err := s.repos.Segment().FindBySegmentSlug(ctx, v)
@@ -128,10 +130,12 @@ func (s *UsersSegmentsService) Delete(ctx context.Context, dto entity.SegmentsBy
 		})
 		if err != nil {
 			errorArray = append(errorArray, HandleServiceError(err))
+			continue
 		}
+		result.Segments = append(result.Segments, v)
 	}
 
-	return errorArray
+	return result, errorArray
 }
 
 func (s *UsersSegmentsService) GetSegmentsByUserID(ctx context.Context, dto entity.GetSegmentsByUserIDDTO) (result entity.SegmentsByUserIDDTO, err error) {

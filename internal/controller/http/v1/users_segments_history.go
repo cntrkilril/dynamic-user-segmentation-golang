@@ -15,7 +15,7 @@ type UsersSegmentsHistoryHandler struct {
 func (h *UsersSegmentsHistoryHandler) getHistoryByUserIDAndYearMonth() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		var p entity.GetCSVHistoryByUserIDAndYearMonthDTO
-		if err := h.val.ValidateRequestBody(c, &p); err != nil {
+		if err := h.val.ValidateQueryParams(c, &p); err != nil {
 			return c.SendStatus(fiber.StatusBadRequest)
 		}
 		res, err := h.usersSegmentsHistoryService.GetCSVHistoryByUserID(c.Context(), p)
@@ -32,7 +32,7 @@ func (h *UsersSegmentsHistoryHandler) getHistoryByUserIDAndYearMonth() fiber.Han
 }
 
 func (h *UsersSegmentsHistoryHandler) Register(r fiber.Router) {
-	r.Post("get-by-user-id-and-year-month",
+	r.Get("get-by-user-id-and-year-month",
 		h.getHistoryByUserIDAndYearMonth())
 }
 

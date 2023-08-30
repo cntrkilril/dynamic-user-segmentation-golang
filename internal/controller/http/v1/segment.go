@@ -51,7 +51,7 @@ func (h *SegmentHandler) delete() fiber.Handler {
 func (h *SegmentHandler) Register(r fiber.Router) {
 	r.Post("create",
 		h.create())
-	r.Post("delete",
+	r.Delete("delete",
 		h.delete())
 }
 
