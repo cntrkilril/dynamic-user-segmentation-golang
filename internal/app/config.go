@@ -49,7 +49,7 @@ func LoadConfig() (*Config, error) {
 
 	cfg := &Config{
 		HTTP: HTTP{
-			Host:     "localhost",
+			Host:     "0.0.0.0",
 			Port:     "8080",
 			Protocol: "http",
 		},
@@ -57,7 +57,7 @@ func LoadConfig() (*Config, error) {
 			Level: &defaultLogLevel,
 		},
 		Postgres: Postgres{
-			ConnString:      "postgresql://root:pass@127.0.0.1:5432/root?sslmode=disable",
+			ConnString:      "postgresql://root:pass@postgres:5432/root?sslmode=disable",
 			MaxOpenConns:    10,
 			ConnMaxLifetime: 20,
 			MaxIdleConns:    15,
@@ -68,7 +68,7 @@ func LoadConfig() (*Config, error) {
 		},
 		Swagger: Swagger{
 			PathToConfigFile: "./docs",
-			ConfigUrl:        "http://localhost:8080/docs/swagger.yaml",
+			ConfigUrl:        "http://0.0.0.0:8080/docs/swagger.yaml",
 		},
 	}
 
