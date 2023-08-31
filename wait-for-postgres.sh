@@ -5,7 +5,7 @@ set -e
 
 host="$1"
 shift
-cmd="$@"
+cmd=v"$@"
 
 until PGPASSWORD="pass" psql -h "$host" -U "root" -c '\q'; do
   echo >&2 "Postgres is unavailable - sleeping"
